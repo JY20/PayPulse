@@ -38,6 +38,10 @@ The server will run on `http://localhost:3001`
 
 ## 🗂️ Data Storage
 
+The backend uses JSON file-based storage with two main data files:
+
+### User Data (`data/users.json`)
+
 User data is stored in `data/users.json` with the following structure:
 
 ```json
@@ -81,6 +85,25 @@ User data is stored in `data/users.json` with the following structure:
   }
 }
 ```
+
+### Admin Data (`data/admin.json`)
+
+Admin configuration is stored in `data/admin.json`:
+
+```json
+{
+  "name": "System Admin",
+  "address": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
+  "balance": 5000.00,
+  "configured": true
+}
+```
+
+**Fields:**
+- `name` - Admin display name
+- `address` - Admin's Polkadot wallet address
+- `balance` - Total accumulated balance from all payments
+- `configured` - Whether admin has been set up (must be `true` for payments to be credited)
 
 ## 📡 API Endpoints
 
@@ -374,6 +397,142 @@ GET /api/users/:address/calendar
 - Only includes future dates
 - One event per membership per month
 - Events are sorted by date
+
+### Admin Management
+
+#### Get Admin Configuration
+```http
+GET /api/admin/config
+```
+
+**Response:**
+```json
+{
+  "name": "System Admin",
+  "address": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
+  "balance": 5000.00,
+  "configured": true
+}
+```
+
+#### Update Admin Configuration
+```http
+PUT /api/admin/config
+```
+
+**Request Body:**
+```json
+{
+  "name": "Admin Name",
+  "address": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "admin": {
+    "name": "Admin Name",
+    "address": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
+    "balance": 5000.00,
+    "configured": true
+  }
+}
+```
+
+**Notes:**
+- Admin must be configured before payments will be credited
+- All membership payments (automatic and manual) are credited to the admin account
+- Admin balance accumulates with each successful payment
+- The admin address can be a Polkadot wallet address
+
+#### Manual Payment Processing (Admin Only)
+```http
+POST /api/admin/process-payments
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Payment processing completed"
+}
+```
+
+**Notes:**
+- Manually triggers the automatic payment processor
+- Useful for testing or forcing immediate payment checks
+- Processes all due payments across all users
+
+#### Retry Failed Payment
+```http
+POST /api/users/:address/memberships/:membershipId/retry
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "balance": 950.50,
+  "transaction": {...},
+  "membership": {...}
+}
+```
+
+**Validation:**
+- Membership must be in `payment_failed` status
+- User must have sufficient balance
+- Credits admin account upon successful retry
+
+## ⏰ Automatic Payment System
+
+The backend includes an automatic payment scheduler that:
+
+- **Checks every hour** for due membership payments
+- **Automatically processes** payments when `nextPaymentDate` is reached
+- **Credits admin account** for each successful payment
+- **Handles failures** gracefully by marking memberships as `payment_failed`
+- **Logs all activity** with detailed console output
+
+### Payment Flow
+
+1. **User makes manual payment** → Balance deducted → Admin credited → Next payment date set
+2. **Scheduled check runs** → Due payments identified → Automatic processing
+3. **Sufficient balance** → Payment succeeds → Admin credited → Membership renewed
+4. **Insufficient balance** → Payment fails → Transaction logged → Membership marked as failed
+
+### Transaction Types
+
+```json
+{
+  "type": "membership_payment",
+  "status": "completed",
+  "automatic": true  // Indicates auto-payment
+}
+```
+
+```json
+{
+  "type": "membership_payment", 
+  "status": "failed",
+  "automatic": true,
+  "reason": "Insufficient balance"
+}
+```
+
+### Admin Data Storage
+
+Admin configuration is stored in `data/admin.json`:
+
+```json
+{
+  "name": "System Admin",
+  "address": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
+  "balance": 5000.00,
+  "configured": true
+}
+```
 
 ## 🔧 Configuration
 
