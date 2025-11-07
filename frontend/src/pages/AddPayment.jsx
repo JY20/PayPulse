@@ -65,24 +65,24 @@ const AddPayment = () => {
     <div className="max-w-2xl mx-auto space-y-6">
       <button
         onClick={() => navigate(-1)}
-        className="flex items-center text-gray-600 hover:text-gray-900 transition"
+        className="flex items-center text-textSecondary hover:text-textPrimary transition"
       >
         <ArrowLeft className="h-5 w-5 mr-2" />
         Back
       </button>
 
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">
+        <h1 className="text-3xl font-bold text-textPrimary">
           {isEditMode ? 'Edit Payment' : 'Add New Payment'}
         </h1>
-        <p className="text-gray-600 mt-1">
+        <p className="text-textSecondary mt-1">
           {isEditMode ? 'Update your recurring payment details' : 'Set up a new recurring payment'}
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="card space-y-6">
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="name" className="block text-sm font-medium text-textPrimary mb-2">
             Payment Name *
           </label>
           <input
@@ -99,7 +99,7 @@ const AddPayment = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="category" className="block text-sm font-medium text-textPrimary mb-2">
               Category *
             </label>
             <select
@@ -122,7 +122,7 @@ const AddPayment = () => {
           </div>
 
           <div>
-            <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="amount" className="block text-sm font-medium text-textPrimary mb-2">
               Amount ($) *
             </label>
             <input
@@ -142,7 +142,7 @@ const AddPayment = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label htmlFor="frequency" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="frequency" className="block text-sm font-medium text-textPrimary mb-2">
               Frequency *
             </label>
             <select
@@ -161,7 +161,7 @@ const AddPayment = () => {
           </div>
 
           <div>
-            <label htmlFor="nextPaymentDate" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="nextPaymentDate" className="block text-sm font-medium text-textPrimary mb-2">
               Next Payment Date *
             </label>
             <input
@@ -177,7 +177,7 @@ const AddPayment = () => {
         </div>
 
         <div>
-          <label htmlFor="paymentMethod" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="paymentMethod" className="block text-sm font-medium text-textPrimary mb-2">
             Payment Method *
           </label>
           <input
@@ -199,9 +199,9 @@ const AddPayment = () => {
             name="autoDeduct"
             checked={formData.autoDeduct}
             onChange={handleChange}
-            className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+            className="h-4 w-4 text-secondary focus:ring-accent border-textSecondary/20 rounded"
           />
-          <label htmlFor="autoDeduct" className="ml-2 block text-sm text-gray-700">
+          <label htmlFor="autoDeduct" className="ml-2 block text-sm text-textPrimary">
             Enable automatic deduction
           </label>
         </div>

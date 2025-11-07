@@ -33,19 +33,19 @@ const Settings = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-600 mt-1">Manage your account preferences</p>
+        <h1 className="text-3xl font-bold text-textPrimary">Settings</h1>
+        <p className="text-textSecondary mt-1">Manage your account preferences</p>
       </div>
 
       {/* Profile Section */}
       <div className="card">
         <div className="flex items-center gap-3 mb-6">
-          <User className="h-6 w-6 text-primary-600" />
-          <h2 className="text-xl font-bold text-gray-900">Profile</h2>
+          <User className="h-6 w-6 text-secondary" />
+          <h2 className="text-xl font-bold text-textPrimary">Profile</h2>
         </div>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
+            <label className="block text-sm font-medium text-textPrimary mb-2">Name</label>
             <input
               type="text"
               defaultValue="John Doe"
@@ -53,7 +53,7 @@ const Settings = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <label className="block text-sm font-medium text-textPrimary mb-2">Email</label>
             <input
               type="email"
               defaultValue="john.doe@example.com"
@@ -67,19 +67,19 @@ const Settings = () => {
       {/* Notifications */}
       <div className="card">
         <div className="flex items-center gap-3 mb-6">
-          <Bell className="h-6 w-6 text-primary-600" />
-          <h2 className="text-xl font-bold text-gray-900">Notifications</h2>
+          <Bell className="h-6 w-6 text-secondary" />
+          <h2 className="text-xl font-bold text-textPrimary">Notifications</h2>
         </div>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium text-gray-900">Email Notifications</p>
-              <p className="text-sm text-gray-600">Receive payment alerts via email</p>
+              <p className="font-medium text-textPrimary">Email Notifications</p>
+              <p className="text-sm text-textSecondary">Receive payment alerts via email</p>
             </div>
             <button
               onClick={() => handleToggle('emailNotifications')}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-                settings.emailNotifications ? 'bg-primary-600' : 'bg-gray-300'
+                settings.emailNotifications ? 'bg-secondary' : 'bg-textSecondary/30'
               }`}
             >
               <span
@@ -92,13 +92,13 @@ const Settings = () => {
           
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium text-gray-900">Push Notifications</p>
-              <p className="text-sm text-gray-600">Receive push notifications on your device</p>
+              <p className="font-medium text-textPrimary">Push Notifications</p>
+              <p className="text-sm text-textSecondary">Receive push notifications on your device</p>
             </div>
             <button
               onClick={() => handleToggle('pushNotifications')}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-                settings.pushNotifications ? 'bg-primary-600' : 'bg-gray-300'
+                settings.pushNotifications ? 'bg-secondary' : 'bg-textSecondary/30'
               }`}
             >
               <span
@@ -111,13 +111,13 @@ const Settings = () => {
 
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium text-gray-900">Payment Reminders</p>
-              <p className="text-sm text-gray-600">Get reminded 3 days before payment</p>
+              <p className="font-medium text-textPrimary">Payment Reminders</p>
+              <p className="text-sm text-textSecondary">Get reminded 3 days before payment</p>
             </div>
             <button
               onClick={() => handleToggle('paymentReminders')}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-                settings.paymentReminders ? 'bg-primary-600' : 'bg-gray-300'
+                settings.paymentReminders ? 'bg-secondary' : 'bg-textSecondary/30'
               }`}
             >
               <span
@@ -130,13 +130,13 @@ const Settings = () => {
 
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium text-gray-900">Weekly Report</p>
-              <p className="text-sm text-gray-600">Receive weekly payment summary</p>
+              <p className="font-medium text-textPrimary">Weekly Report</p>
+              <p className="text-sm text-textSecondary">Receive weekly payment summary</p>
             </div>
             <button
               onClick={() => handleToggle('weeklyReport')}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-                settings.weeklyReport ? 'bg-primary-600' : 'bg-gray-300'
+                settings.weeklyReport ? 'bg-secondary' : 'bg-textSecondary/30'
               }`}
             >
               <span
@@ -152,12 +152,12 @@ const Settings = () => {
       {/* Preferences */}
       <div className="card">
         <div className="flex items-center gap-3 mb-6">
-          <Shield className="h-6 w-6 text-primary-600" />
-          <h2 className="text-xl font-bold text-gray-900">Preferences</h2>
+          <Shield className="h-6 w-6 text-secondary" />
+          <h2 className="text-xl font-bold text-textPrimary">Preferences</h2>
         </div>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Currency</label>
+            <label className="block text-sm font-medium text-textPrimary mb-2">Currency</label>
             <select
               value={settings.currency}
               onChange={(e) => handleChange('currency', e.target.value)}
@@ -170,7 +170,7 @@ const Settings = () => {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Date Format</label>
+            <label className="block text-sm font-medium text-textPrimary mb-2">Date Format</label>
             <select
               value={settings.dateFormat}
               onChange={(e) => handleChange('dateFormat', e.target.value)}
@@ -187,21 +187,21 @@ const Settings = () => {
       {/* Payment Methods */}
       <div className="card">
         <div className="flex items-center gap-3 mb-6">
-          <CreditCard className="h-6 w-6 text-primary-600" />
-          <h2 className="text-xl font-bold text-gray-900">Payment Methods</h2>
+          <CreditCard className="h-6 w-6 text-secondary" />
+          <h2 className="text-xl font-bold text-textPrimary">Payment Methods</h2>
         </div>
         <div className="space-y-3">
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-background rounded-lg">
             <div>
-              <p className="font-medium text-gray-900">Credit Card</p>
-              <p className="text-sm text-gray-600">•••• •••• •••• 1234</p>
+              <p className="font-medium text-textPrimary">Credit Card</p>
+              <p className="text-sm text-textSecondary">•••• •••• •••• 1234</p>
             </div>
-            <span className="text-xs bg-primary-100 text-primary-800 px-2 py-1 rounded">Primary</span>
+            <span className="text-xs bg-accent/30 text-primary px-2 py-1 rounded">Primary</span>
           </div>
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-background rounded-lg">
             <div>
-              <p className="font-medium text-gray-900">Bank Account</p>
-              <p className="text-sm text-gray-600">•••• •••• •••• 5678</p>
+              <p className="font-medium text-textPrimary">Bank Account</p>
+              <p className="text-sm text-textSecondary">•••• •••• •••• 5678</p>
             </div>
           </div>
           <button className="btn-primary w-full">Add Payment Method</button>
@@ -210,18 +210,18 @@ const Settings = () => {
 
       {/* Data Management */}
       <div className="card">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Data Management</h2>
+        <h2 className="text-xl font-bold text-textPrimary mb-6">Data Management</h2>
         <div className="space-y-3">
           <button
             onClick={handleExportData}
-            className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition"
+            className="w-full flex items-center justify-center gap-2 bg-success hover:bg-success/90 text-white font-semibold py-3 px-4 rounded-lg transition"
           >
             <Download className="h-5 w-5" />
             Export My Data
           </button>
           <button
             onClick={handleClearData}
-            className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-lg transition"
+            className="w-full flex items-center justify-center gap-2 bg-error hover:bg-error/90 text-white font-semibold py-3 px-4 rounded-lg transition"
           >
             <Trash2 className="h-5 w-5" />
             Clear All Data

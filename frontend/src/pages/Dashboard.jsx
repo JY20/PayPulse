@@ -28,28 +28,28 @@ const Dashboard = () => {
       title: 'Monthly Total',
       value: `$${monthlyTotal.toFixed(2)}`,
       icon: DollarSign,
-      color: 'bg-green-500',
+      color: 'bg-success',
       change: '+12% from last month'
     },
     {
       title: 'Active Payments',
       value: activePayments.length,
       icon: Activity,
-      color: 'bg-blue-500',
+      color: 'bg-secondary',
       change: `${payments.length} total subscriptions`
     },
     {
       title: 'Next Payment',
       value: upcomingPayments.length > 0 ? format(upcomingPayments[0].nextPaymentDate, 'MMM dd') : 'None',
       icon: Calendar,
-      color: 'bg-purple-500',
+      color: 'bg-primary',
       change: `${upcomingPayments.length} this month`
     },
     {
       title: 'Paid This Month',
       value: `$${paymentHistory.filter(p => isThisMonth(p.date)).reduce((sum, p) => sum + p.amount, 0).toFixed(2)}`,
       icon: TrendingUp,
-      color: 'bg-orange-500',
+      color: 'bg-warning',
       change: `${paymentHistory.filter(p => isThisMonth(p.date)).length} transactions`
     }
   ]
@@ -57,8 +57,8 @@ const Dashboard = () => {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-1">Welcome back! Here's your payment overview</p>
+        <h1 className="text-3xl font-bold text-textPrimary">Dashboard</h1>
+        <p className="text-textSecondary mt-1">Welcome back! Here's your payment overview</p>
       </div>
 
       {/* Stats Grid */}
@@ -69,9 +69,9 @@ const Dashboard = () => {
             <div key={index} className="card">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">{stat.value}</p>
-                  <p className="text-xs text-gray-500 mt-1">{stat.change}</p>
+                  <p className="text-sm font-medium text-textSecondary">{stat.title}</p>
+                  <p className="text-3xl font-bold text-textPrimary mt-2">{stat.value}</p>
+                  <p className="text-xs text-textSecondary mt-1">{stat.change}</p>
                 </div>
                 <div className={`${stat.color} p-3 rounded-lg`}>
                   <Icon className="h-6 w-6 text-white" />
@@ -84,19 +84,19 @@ const Dashboard = () => {
 
       {/* Overdue Alerts */}
       {overduePayments.length > 0 && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <h3 className="text-red-800 font-semibold flex items-center gap-2">
+        <div className="bg-error/10 border border-error/30 rounded-lg p-4">
+          <h3 className="text-error font-semibold flex items-center gap-2">
             <Activity className="h-5 w-5" />
             Overdue Payments
           </h3>
           <div className="mt-3 space-y-2">
             {overduePayments.map(payment => (
-              <div key={payment.id} className="flex justify-between items-center bg-white p-3 rounded-lg">
+              <div key={payment.id} className="flex justify-between items-center bg-surface p-3 rounded-lg">
                 <div>
-                  <p className="font-medium text-gray-900">{payment.name}</p>
-                  <p className="text-sm text-gray-600">Due: {format(payment.nextPaymentDate, 'MMM dd, yyyy')}</p>
+                  <p className="font-medium text-textPrimary">{payment.name}</p>
+                  <p className="text-sm text-textSecondary">Due: {format(payment.nextPaymentDate, 'MMM dd, yyyy')}</p>
                 </div>
-                <p className="text-red-600 font-bold">${payment.amount}</p>
+                <p className="text-error font-bold">${payment.amount}</p>
               </div>
             ))}
           </div>
@@ -107,29 +107,29 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="card">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-900">Upcoming Payments</h2>
-            <Link to="/calendar" className="text-primary-600 hover:text-primary-700 text-sm font-medium">
+            <h2 className="text-xl font-bold text-textPrimary">Upcoming Payments</h2>
+            <Link to="/calendar" className="text-secondary hover:text-primary text-sm font-medium">
               View All
             </Link>
           </div>
           <div className="space-y-3">
             {upcomingPayments.length > 0 ? (
               upcomingPayments.map((payment) => (
-                <div key={payment.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                <div key={payment.id} className="flex items-center justify-between p-3 bg-background rounded-lg hover:bg-accent/10 transition">
                   <div className="flex items-center space-x-3">
-                    <div className="bg-primary-100 p-2 rounded-lg">
-                      <Calendar className="h-5 w-5 text-primary-600" />
+                    <div className="bg-accent/20 p-2 rounded-lg">
+                      <Calendar className="h-5 w-5 text-secondary" />
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900">{payment.name}</p>
-                      <p className="text-sm text-gray-600">{format(payment.nextPaymentDate, 'MMM dd, yyyy')}</p>
+                      <p className="font-medium text-textPrimary">{payment.name}</p>
+                      <p className="text-sm text-textSecondary">{format(payment.nextPaymentDate, 'MMM dd, yyyy')}</p>
                     </div>
                   </div>
-                  <p className="font-bold text-gray-900">${payment.amount}</p>
+                  <p className="font-bold text-textPrimary">${payment.amount}</p>
                 </div>
               ))
             ) : (
-              <p className="text-gray-500 text-center py-8">No upcoming payments this month</p>
+              <p className="text-textSecondary text-center py-8">No upcoming payments this month</p>
             )}
           </div>
         </div>
@@ -137,29 +137,29 @@ const Dashboard = () => {
         {/* Recent Activity */}
         <div className="card">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-900">Recent Activity</h2>
-            <Link to="/payments" className="text-primary-600 hover:text-primary-700 text-sm font-medium">
+            <h2 className="text-xl font-bold text-textPrimary">Recent Activity</h2>
+            <Link to="/payments" className="text-secondary hover:text-primary text-sm font-medium">
               View All
             </Link>
           </div>
           <div className="space-y-3">
             {recentHistory.length > 0 ? (
               recentHistory.map((transaction) => (
-                <div key={transaction.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div key={transaction.id} className="flex items-center justify-between p-3 bg-background rounded-lg">
                   <div className="flex items-center space-x-3">
-                    <div className="bg-green-100 p-2 rounded-lg">
-                      <DollarSign className="h-5 w-5 text-green-600" />
+                    <div className="bg-success/20 p-2 rounded-lg">
+                      <DollarSign className="h-5 w-5 text-success" />
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900">{transaction.name}</p>
-                      <p className="text-sm text-gray-600">{format(transaction.date, 'MMM dd, yyyy')}</p>
+                      <p className="font-medium text-textPrimary">{transaction.name}</p>
+                      <p className="text-sm text-textSecondary">{format(transaction.date, 'MMM dd, yyyy')}</p>
                     </div>
                   </div>
-                  <p className="font-bold text-green-600">-${transaction.amount}</p>
+                  <p className="font-bold text-success">-${transaction.amount}</p>
                 </div>
               ))
             ) : (
-              <p className="text-gray-500 text-center py-8">No recent transactions</p>
+              <p className="text-textSecondary text-center py-8">No recent transactions</p>
             )}
           </div>
         </div>
