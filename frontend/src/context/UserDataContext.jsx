@@ -283,6 +283,67 @@ export const UserDataProvider = ({ children }) => {
     }
   }
 
+  // Pay membership
+  const payMembership = async (membershipId) => {
+    if (!selectedAccount) {
+      throw new Error('No account selected')
+    }
+
+    const membership = userData?.memberships?.find(m => m.id === membershipId)
+    
+    if (!membership) {
+      throw new Error('Membership not found')
+    }
+
+    if (!userData || userData.balance < membership.amount) {
+      throw new Error('Insufficient balance')
+    }
+
+    setIsLoading(true)
+    setError(null)
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/users/${selectedAccount.address}/memberships/${membershipId}/pay`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error || 'Failed to process payment')
+      }
+
+      const data = await response.json()
+      
+      // Update local state with new balance, transaction, and updated membership
+      setUserData(prev => ({
+        ...prev,
+        balance: data.balance,
+        transactions: [data.transaction, ...(prev?.transactions || [])],
+        memberships: prev.memberships.map(m => 
+          m.id === membershipId ? data.membership : m
+        )
+      }))
+
+      return { 
+        success: true, 
+        balance: data.balance, 
+        transaction: data.transaction,
+        membership: data.membership
+      }
+    } catch (err) {
+      console.error('Error paying membership:', err)
+      setError(err.message)
+      return { success: false, error: err.message }
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const value = {
     userData,
     isLoading,
@@ -294,6 +355,7 @@ export const UserDataProvider = ({ children }) => {
     fetchMemberships,
     fetchCalendarEvents,
     updateProfile,
+    payMembership,
     refreshUserData: () => selectedAccount && fetchUserData(selectedAccount.address)
   }
 

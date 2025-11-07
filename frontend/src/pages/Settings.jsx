@@ -163,7 +163,7 @@ const Settings = () => {
           <div className="bg-accent/10 border border-accent/20 p-4 rounded-lg">
             <p className="text-sm text-textSecondary mb-1">Platform Balance</p>
             <p className="text-2xl font-bold text-accent">
-              {userData ? `${userData.balance.toFixed(2)} DOT` : '0.00 DOT'}
+              {userData ? `${(userData.balance ?? 0).toFixed(2)} DOT` : '0.00 DOT'}
             </p>
           </div>
         </div>
@@ -225,39 +225,67 @@ const Settings = () => {
           <div className="flex items-center gap-3 mb-6">
             <History className="h-6 w-6 text-secondary" />
             <h2 className="text-xl font-bold text-textPrimary">Recent Transactions</h2>
+            <span className="text-sm text-textSecondary ml-auto">
+              Showing {Math.min(userData.transactions.length, 20)} of {userData.transactions.length}
+            </span>
           </div>
           
-          <div className="space-y-2">
-            {userData.transactions.slice(0, 10).map((tx) => (
-              <div 
-                key={tx.id}
-                className="bg-background/50 p-4 rounded-lg"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <div>
-                    <p className="font-medium text-textPrimary capitalize">
-                      {tx.type}
-                    </p>
-                    <p className="text-sm text-textSecondary">
-                      {new Date(tx.timestamp).toLocaleString()}
-                    </p>
+          <div className="max-h-[600px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-accent/20 scrollbar-track-background">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {userData.transactions.slice(0, 20).map((tx) => {
+                const isDeposit = tx.type === 'deposit'
+                const displayType = tx.type === 'membership_payment' 
+                  ? 'Membership Payment' 
+                  : tx.type
+                
+                return (
+                  <div 
+                    key={tx.id}
+                    className="bg-background/50 p-4 rounded-lg border border-textSecondary/10 hover:border-accent/30 transition-colors"
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <div className={`${isDeposit ? 'bg-success/20' : 'bg-error/20'} p-1.5 rounded`}>
+                            <DollarSign className={`h-4 w-4 ${isDeposit ? 'text-success' : 'text-error'}`} />
+                          </div>
+                          <p className="font-medium text-textPrimary text-sm capitalize truncate">
+                            {displayType}
+                          </p>
+                        </div>
+                        {tx.membershipTitle && (
+                          <p className="text-xs font-medium text-accent mb-1 truncate">
+                            {tx.membershipTitle}
+                          </p>
+                        )}
+                        <p className="text-xs text-textSecondary">
+                          {new Date(tx.timestamp).toLocaleString()}
+                        </p>
+                      </div>
+                      <div className="text-right ml-2">
+                        <p className={`font-bold text-lg ${
+                          isDeposit ? 'text-green-600' : 'text-red-600'
+                        }`}>
+                          {isDeposit ? '+' : '-'}{tx.amount.toFixed(2)}
+                        </p>
+                        <p className="text-xs text-textSecondary">DOT</p>
+                      </div>
+                    </div>
+                    {tx.txHash && (
+                      <p className="text-xs text-textSecondary font-mono break-all mt-2 pt-2 border-t border-textSecondary/10">
+                        {tx.txHash.substring(0, 20)}...
+                      </p>
+                    )}
+                    <div className="flex items-center justify-between mt-2 pt-2 border-t border-textSecondary/10">
+                      <p className="text-xs text-textSecondary">Status</p>
+                      <span className="text-xs px-2 py-1 rounded bg-success/20 text-success capitalize">
+                        {tx.status}
+                      </span>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className={`font-semibold ${
-                      tx.type === 'deposit' ? 'text-green-600' : 'text-red-600'
-                    }`}>
-                      {tx.type === 'deposit' ? '+' : '-'}{tx.amount.toFixed(2)} DOT
-                    </p>
-                    <p className="text-xs text-textSecondary capitalize">{tx.status}</p>
-                  </div>
-                </div>
-                {tx.txHash && (
-                  <p className="text-xs text-textSecondary font-mono break-all mt-1">
-                    Tx: {tx.txHash}
-                  </p>
-                )}
-              </div>
-            ))}
+                )
+              })}
+            </div>
           </div>
         </div>
       )}
@@ -269,7 +297,7 @@ const Settings = () => {
           <h2 className="text-xl font-bold text-textPrimary">Account Statistics</h2>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-background/50 p-4 rounded-lg">
             <p className="text-sm text-textSecondary mb-1">Total Transactions</p>
             <p className="text-2xl font-bold text-textPrimary">
@@ -281,6 +309,13 @@ const Settings = () => {
             <p className="text-sm text-textSecondary mb-1">Total Deposits</p>
             <p className="text-2xl font-bold text-green-600">
               {userData?.transactions?.filter(tx => tx.type === 'deposit').reduce((sum, tx) => sum + tx.amount, 0).toFixed(2) || '0.00'} DOT
+            </p>
+          </div>
+          
+          <div className="bg-background/50 p-4 rounded-lg">
+            <p className="text-sm text-textSecondary mb-1">Total Payments</p>
+            <p className="text-2xl font-bold text-red-600">
+              {userData?.transactions?.filter(tx => tx.type === 'membership_payment').reduce((sum, tx) => sum + tx.amount, 0).toFixed(2) || '0.00'} DOT
             </p>
           </div>
           

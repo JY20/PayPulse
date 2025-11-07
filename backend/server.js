@@ -323,6 +323,91 @@ app.post('/api/users/:address/withdraw', async (req, res) => {
   }
 })
 
+// Pay membership
+app.post('/api/users/:address/memberships/:membershipId/pay', async (req, res) => {
+  try {
+    const { address, membershipId } = req.params
+    
+    const users = await readUsersData()
+    
+    if (!users[address]) {
+      return res.status(404).json({ error: 'User not found' })
+    }
+    
+    const membership = users[address].memberships.find(m => m.id === membershipId)
+    
+    if (!membership) {
+      return res.status(404).json({ error: 'Membership not found' })
+    }
+    
+    // Check if user has sufficient balance
+    if (users[address].balance < membership.amount) {
+      return res.status(400).json({ 
+        error: 'Insufficient balance',
+        required: membership.amount,
+        available: users[address].balance
+      })
+    }
+    
+    // Deduct balance
+    users[address].balance -= membership.amount
+    
+    // Add payment transaction
+    const transaction = {
+      id: Date.now().toString(),
+      type: 'membership_payment',
+      amount: membership.amount,
+      membershipId: membership.id,
+      membershipTitle: membership.title,
+      timestamp: new Date().toISOString(),
+      status: 'completed'
+    }
+    
+    users[address].transactions.unshift(transaction)
+    
+    // Update membership with last payment date and next payment date
+    const now = new Date()
+    membership.lastPaidDate = now.toISOString()
+    
+    // Calculate next payment date
+    // If there's an existing nextPaymentDate in the future, extend from that date
+    // Otherwise, calculate from now
+    let baseDate
+    if (membership.nextPaymentDate) {
+      const existingNextDate = new Date(membership.nextPaymentDate)
+      // If the existing next payment date is in the future, use it as base
+      // This allows multiple payments to stack up
+      baseDate = existingNextDate > now ? existingNextDate : now
+    } else {
+      baseDate = now
+    }
+    
+    // Add one month to the base date, keeping the charge day
+    const nextMonth = new Date(baseDate.getFullYear(), baseDate.getMonth() + 1, membership.chargeDate)
+    membership.nextPaymentDate = nextMonth.toISOString()
+    
+    console.log(`💰 Payment processed for ${membership.title}`)
+    console.log(`   Base date: ${baseDate.toISOString()}`)
+    console.log(`   Next payment: ${membership.nextPaymentDate}`)
+    
+    const success = await writeUsersData(users)
+    
+    if (success) {
+      res.json({
+        success: true,
+        balance: users[address].balance,
+        transaction,
+        membership
+      })
+    } else {
+      res.status(500).json({ error: 'Failed to process payment' })
+    }
+  } catch (error) {
+    console.error('Error processing membership payment:', error)
+    res.status(500).json({ error: 'Failed to process payment' })
+  }
+})
+
 // Update user profile
 app.put('/api/users/:address/profile', async (req, res) => {
   try {

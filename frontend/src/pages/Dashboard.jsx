@@ -30,13 +30,15 @@ const Dashboard = () => {
   )
 
   const thisMonthTotal = thisMonthTransactions.reduce((sum, t) => {
-    return t.type === 'deposit' ? sum + t.amount : sum - t.amount
+    if (t.type === 'deposit') return sum + t.amount
+    if (t.type === 'membership_payment' || t.type === 'withdrawal') return sum - t.amount
+    return sum
   }, 0)
 
   const stats = [
     {
       title: 'Platform Balance',
-      value: `${userData?.balance.toFixed(2) || '0.00'} DOT`,
+      value: `${(userData?.balance ?? 0).toFixed(2)} DOT`,
       icon: Wallet,
       color: 'bg-accent',
       change: 'Available for payments'
@@ -80,9 +82,9 @@ const Dashboard = () => {
                 <Wallet className="h-5 w-5 text-accent" />
                 <p className="text-sm font-medium text-textSecondary">Platform Balance</p>
               </div>
-              <p className="text-4xl font-bold text-textPrimary">${userData.balance.toFixed(2)}</p>
+              <p className="text-4xl font-bold text-textPrimary">${(userData?.balance ?? 0).toFixed(2)}</p>
               <p className="text-sm text-textSecondary mt-2">
-                {userData.transactions.length} transactions
+                {userData?.transactions?.length || 0} transactions
               </p>
             </div>
             <Link
@@ -187,27 +189,39 @@ const Dashboard = () => {
               View All
             </Link>
           </div>
-          <div className="space-y-3">
-            {recentTransactions.length > 0 ? (
-              recentTransactions.map((transaction) => (
-                <div key={transaction.id} className="flex items-center justify-between p-3 bg-background rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className={`${transaction.type === 'deposit' ? 'bg-success/20' : 'bg-error/20'} p-2 rounded-lg`}>
-                      <DollarSign className={`h-5 w-5 ${transaction.type === 'deposit' ? 'text-success' : 'text-error'}`} />
+          <div className="max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-accent/20 scrollbar-track-background">
+            <div className="space-y-3">
+              {recentTransactions.length > 0 ? (
+                recentTransactions.map((transaction) => {
+                  const isDeposit = transaction.type === 'deposit'
+                  const displayType = transaction.type === 'membership_payment' 
+                    ? 'Membership Payment' 
+                    : transaction.type
+                  
+                  return (
+                    <div key={transaction.id} className="flex items-center justify-between p-3 bg-background rounded-lg border border-textSecondary/10 hover:border-accent/30 transition-colors">
+                      <div className="flex items-center space-x-3 flex-1 min-w-0">
+                        <div className={`${isDeposit ? 'bg-success/20' : 'bg-error/20'} p-2 rounded-lg flex-shrink-0`}>
+                          <DollarSign className={`h-5 w-5 ${isDeposit ? 'text-success' : 'text-error'}`} />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium text-textPrimary capitalize truncate">{displayType}</p>
+                          {transaction.membershipTitle && (
+                            <p className="text-xs text-accent truncate">{transaction.membershipTitle}</p>
+                          )}
+                          <p className="text-sm text-textSecondary">{format(new Date(transaction.timestamp), 'MMM dd, yyyy')}</p>
+                        </div>
+                      </div>
+                      <p className={`font-bold ml-2 flex-shrink-0 ${isDeposit ? 'text-success' : 'text-error'}`}>
+                        {isDeposit ? '+' : '-'}{transaction.amount.toFixed(2)} DOT
+                      </p>
                     </div>
-                    <div>
-                      <p className="font-medium text-textPrimary capitalize">{transaction.type}</p>
-                      <p className="text-sm text-textSecondary">{format(new Date(transaction.timestamp), 'MMM dd, yyyy')}</p>
-                    </div>
-                  </div>
-                  <p className={`font-bold ${transaction.type === 'deposit' ? 'text-success' : 'text-error'}`}>
-                    {transaction.type === 'deposit' ? '+' : '-'}{transaction.amount.toFixed(2)} DOT
-                  </p>
-                </div>
-              ))
-            ) : (
-              <p className="text-textSecondary text-center py-8">No recent transactions</p>
-            )}
+                  )
+                })
+              ) : (
+                <p className="text-textSecondary text-center py-8">No recent transactions</p>
+              )}
+            </div>
           </div>
         </div>
       </div>

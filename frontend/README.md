@@ -1,59 +1,36 @@
-# PayPulse 💳⚡
+# PayPulse Frontend 🎨
 
-An automated payment platform that seamlessly manages recurring expenses such as memberships, subscriptions, and rent through intelligent scheduled deductions.
+The frontend application for PayPulse - a modern React-based interface for managing recurring payments on the Polkadot network.
 
-![PayPulse](https://img.shields.io/badge/React-18.2.0-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
-
-## Features ✨
-
-- **Dashboard Overview** - View all your payment statistics and upcoming payments at a glance
-- **Payment Management** - Add, edit, pause, and delete recurring payments
-- **Smart Calendar** - Visual calendar showing all your scheduled payments
-- **Multiple Frequencies** - Support for daily, weekly, monthly, and yearly payments
-- **Auto-Deduction** - Automatic payment processing for enabled subscriptions
-- **Payment History** - Track all your past transactions
-- **Categories** - Organize payments by category (Entertainment, Housing, Health, etc.)
-- **Modern UI** - Beautiful, responsive design with Tailwind CSS
-- **Local Storage** - Data persists in your browser
-
-## Tech Stack 🛠️
-
-- **React 18** - Modern React with Hooks
-- **Vite** - Fast build tool and dev server
-- **React Router** - Client-side routing
-- **Tailwind CSS** - Utility-first CSS framework
-- **Lucide React** - Beautiful icon library
-- **date-fns** - Modern date utility library
-
-## Getting Started 🚀
+## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js 16+ and npm/yarn installed
+- Node.js 16+ 
+- npm or yarn
+- Polkadot wallet browser extension (Polkadot{.js}, Talisman, SubWallet, etc.)
 
 ### Installation
 
-1. **Install dependencies:**
-   ```bash
-   npm install
-   ```
+```bash
+npm install
+```
 
-2. **Start the development server:**
-   ```bash
-   npm run dev
-   ```
+### Development
 
-3. **Open your browser:**
-   Navigate to `http://localhost:3000`
+```bash
+npm run dev
+```
 
-### Build for Production
+The app will be available at `http://localhost:5173`
+
+### Production Build
 
 ```bash
 npm run build
 ```
 
-The build files will be generated in the `dist` folder.
+Build output will be in the `dist/` directory.
 
 ### Preview Production Build
 
@@ -61,125 +38,397 @@ The build files will be generated in the `dist` folder.
 npm run preview
 ```
 
-## Usage 📖
+## 📦 Tech Stack
 
-### Adding a Payment
+### Core
+- **React 18.2** - UI library with Hooks
+- **Vite 5** - Build tool and dev server
+- **React Router DOM 6** - Client-side routing
 
-1. Navigate to "Add Payment" in the navigation menu
-2. Fill in the payment details:
-   - Name (e.g., "Netflix Subscription")
-   - Category (Entertainment, Housing, Health, etc.)
-   - Amount
-   - Frequency (Daily, Weekly, Monthly, Yearly)
-   - Next Payment Date
-   - Payment Method
-3. Enable/disable automatic deduction
-4. Click "Add Payment"
+### Styling
+- **Tailwind CSS 3** - Utility-first CSS framework
+- **PostCSS** - CSS processing
+- **Autoprefixer** - CSS vendor prefixing
 
-### Managing Payments
+### Polkadot Integration
+- **@polkadot/api** - Polkadot API for blockchain interaction
+- **@polkadot/extension-dapp** - Browser wallet integration
+- **@polkadot/util** - Utility functions
+- **@polkadot/util-crypto** - Cryptographic utilities
+- **polkadot-api** - Modern Polkadot API
+- **@polkadot-api/pjs-signer** - Transaction signing
 
-- **View All Payments**: Go to the Payments page to see all your recurring payments
-- **Search & Filter**: Use the search bar and category/status filters
-- **Edit**: Click the edit icon to modify payment details
-- **Pause/Resume**: Click the pause/play icon to temporarily stop/resume payments
-- **Delete**: Click the trash icon to remove a payment
+### Utilities
+- **date-fns** - Date manipulation and formatting
+- **lucide-react** - Icon library
 
-### Calendar View
-
-- View all payments for any month
-- Click prev/next arrows to navigate between months
-- See payments highlighted on their due dates
-- View a summary of all payments for the selected month
-
-### Settings
-
-- Configure notification preferences
-- Manage payment methods
-- Export or clear your data
-- Update profile information
-
-## Project Structure 📁
+## 🏗️ Project Structure
 
 ```
-PayPulse/
-├── public/
-├── src/
-│   ├── components/
-│   │   └── Layout.jsx          # Main layout with navigation
-│   ├── context/
-│   │   └── PaymentContext.jsx  # Global state management
-│   ├── pages/
-│   │   ├── Dashboard.jsx       # Dashboard overview
-│   │   ├── Payments.jsx        # All payments list
-│   │   ├── AddPayment.jsx      # Add/Edit payment form
-│   │   ├── Calendar.jsx        # Calendar view
-│   │   └── Settings.jsx        # Settings page
-│   ├── App.jsx                 # Main app component
-│   ├── main.jsx               # Entry point
-│   └── index.css              # Global styles
-├── index.html
-├── package.json
-├── vite.config.js
-├── tailwind.config.js
-└── README.md
+src/
+├── components/
+│   ├── Layout.jsx              # Main app layout with navigation
+│   └── WalletButton.jsx        # Wallet connection button component
+│
+├── context/
+│   ├── PaymentContext.jsx      # Local payment state (legacy, can be removed)
+│   ├── PolkadotContext.jsx     # Wallet connection & blockchain state
+│   └── UserDataContext.jsx     # User data, backend API calls, payment logic
+│
+├── pages/
+│   ├── Dashboard.jsx           # Main dashboard with stats and overview
+│   ├── Payments.jsx            # Memberships list with pay functionality
+│   ├── AddPayment.jsx          # Add/edit payment form (legacy)
+│   ├── DepositFunds.jsx        # Deposit DOT to platform balance
+│   ├── Calendar.jsx            # Calendar view of payment schedules
+│   └── Settings.jsx            # User settings and transaction history
+│
+├── App.jsx                     # Root component with routing
+├── main.jsx                    # Application entry point
+├── index.css                   # Global styles and Tailwind directives
+└── config.js                   # Configuration loader
 ```
 
-## Features in Detail 🔍
+## 🎯 Key Features
 
-### Dashboard
-- **Stats Cards**: Monthly total, active payments, next payment, paid this month
-- **Overdue Alerts**: Highlights any overdue payments
-- **Upcoming Payments**: Next 5 upcoming payments
-- **Recent Activity**: Last 5 transactions
+### 1. Wallet Integration
+- Connect to any Polkadot-compatible wallet
+- Display wallet address and balance
+- Real-time balance updates
+- Multiple account support
 
-### Payment Context
-- Global state management using React Context API
-- LocalStorage persistence for data
-- CRUD operations for payments
-- Payment history tracking
-- Automatic next payment date calculation
+**Components:**
+- `WalletButton.jsx` - Connection UI
+- `PolkadotContext.jsx` - State management
 
-### Responsive Design
-- Mobile-first approach
-- Works seamlessly on desktop, tablet, and mobile
-- Bottom navigation on mobile devices
-- Top navigation on larger screens
+### 2. Balance Management
+- View wallet balance and platform balance
+- Deposit DOT from wallet to platform
+- Transfer functionality with transaction signing
+- Balance validation before payments
 
-## Customization 🎨
+**Pages:**
+- `DepositFunds.jsx` - Deposit interface
+- `Dashboard.jsx` - Balance overview
 
-### Colors
-Edit `tailwind.config.js` to customize the color scheme:
+### 3. Membership Payments
+- View all active memberships
+- Pay memberships directly from platform balance
+- Cumulative payment support (pay multiple months in advance)
+- Real-time payment processing with notifications
+- Track last payment and next due date
 
+**Pages:**
+- `Payments.jsx` - Main payment interface
+- `Dashboard.jsx` - Quick overview
+
+**Context:**
+- `UserDataContext.jsx` - Payment API calls
+
+### 4. Transaction History
+- Complete transaction log
+- Deposit, withdrawal, and payment records
+- Transaction details with timestamps
+- Filter by transaction type
+
+**Pages:**
+- `Settings.jsx` - Full transaction history
+- `Dashboard.jsx` - Recent transactions
+
+### 5. Calendar View
+- Visual representation of payment schedules
+- Monthly view with navigation
+- Membership renewal dates
+- Amount due per day
+
+**Pages:**
+- `Calendar.jsx` - Calendar interface
+
+## 🔌 Context Providers
+
+### PolkadotContext
+
+Manages wallet connection and blockchain interaction.
+
+```jsx
+const {
+  isConnected,
+  accounts,
+  selectedAccount,
+  balance,
+  connectWallet,
+  disconnectWallet,
+  selectAccount,
+  formatBalanceDisplay
+} = usePolkadot()
+```
+
+**Key Functions:**
+- `connectWallet()` - Connect to Polkadot wallet
+- `disconnectWallet()` - Disconnect wallet
+- `selectAccount(address)` - Switch active account
+- `formatBalanceDisplay(balance)` - Format balance for display
+
+### UserDataContext
+
+Manages user data and backend API interactions.
+
+```jsx
+const {
+  userData,
+  isLoading,
+  error,
+  depositFunds,
+  withdrawFunds,
+  payMembership,
+  addMembership,
+  fetchMemberships,
+  fetchTransactions,
+  fetchCalendarEvents,
+  updateProfile,
+  refreshUserData
+} = useUserData()
+```
+
+**Key Functions:**
+- `depositFunds(amount, txHash)` - Add funds to platform balance
+- `withdrawFunds(amount, recipient)` - Withdraw funds
+- `payMembership(membershipId)` - Pay for a membership
+- `fetchMemberships()` - Refresh membership list
+- `updateProfile(name, email)` - Update user profile
+
+**User Data Structure:**
 ```javascript
-colors: {
-  primary: {
-    // Customize these values
-    500: '#0ea5e9',
-    600: '#0284c7',
-    // ...
-  },
+{
+  address: string,
+  name: string,
+  email: string,
+  balance: number,
+  memberships: [
+    {
+      id: string,
+      title: string,
+      description: string,
+      amount: number,
+      chargeDate: number (1-31),
+      status: 'active' | 'paused' | 'cancelled',
+      lastPaidDate?: ISO string,
+      nextPaymentDate?: ISO string
+    }
+  ],
+  transactions: [
+    {
+      id: string,
+      type: 'deposit' | 'withdrawal' | 'membership_payment',
+      amount: number,
+      timestamp: ISO string,
+      status: string,
+      txHash?: string,
+      membershipId?: string,
+      membershipTitle?: string
+    }
+  ]
 }
 ```
 
-### Categories
-Add more categories in `src/pages/AddPayment.jsx`:
+## ⚙️ Configuration
 
-```javascript
-<option value="YourCategory">Your Category</option>
+### Network Configuration
+
+Edit `public/config.json`:
+
+```json
+{
+  "WS_PROVIDER": "wss://westend-rpc.polkadot.io"
+}
 ```
 
-## Contributing 🤝
+**Available Networks:**
+- Westend (Testnet): `wss://westend-rpc.polkadot.io`
+- Polkadot (Mainnet): `wss://rpc.polkadot.io`
+- Kusama: `wss://kusama-rpc.polkadot.io`
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+### API Configuration
 
-## License 📄
+Backend API URL is configured in `UserDataContext.jsx`:
 
-This project is open source and available under the MIT License.
+```javascript
+const API_BASE_URL = 'http://localhost:3001/api'
+```
 
-## Support 💬
+Change this to your backend URL in production.
 
-If you have any questions or need help, please open an issue.
+### Tailwind Configuration
+
+Customize theme in `tailwind.config.js`:
+
+```javascript
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        primary: '#0ea5e9',
+        secondary: '#8b5cf6',
+        accent: '#06b6d4',
+        // Add custom colors
+      }
+    }
+  }
+}
+```
+
+## 🎨 Styling
+
+### Color Scheme
+
+The app uses a gradient-based color scheme defined in `tailwind.config.js`:
+
+- **Primary**: Blue (`#0ea5e9`) - Main brand color
+- **Secondary**: Purple (`#8b5cf6`) - Accent color
+- **Accent**: Cyan (`#06b6d4`) - Highlight color
+- **Success**: Green - Positive actions
+- **Warning**: Orange - Alerts
+- **Error**: Red - Errors and critical actions
+
+### Custom CSS
+
+Global styles are defined in `index.css`:
+
+- `.card` - Card container style
+- `.btn-primary` - Primary button style
+- `.btn-secondary` - Secondary button style
+- `.input-field` - Form input style
+
+## 📱 Responsive Design
+
+The app is fully responsive with breakpoints:
+
+- **Mobile**: < 640px (sm)
+- **Tablet**: 640px - 1024px (md)
+- **Desktop**: > 1024px (lg)
+
+Navigation adapts:
+- Mobile: Bottom tab bar
+- Desktop: Top navigation bar
+
+## 🔐 Security Considerations
+
+1. **Wallet Connection**: Uses official Polkadot extension APIs
+2. **Transaction Signing**: All transactions signed in user's wallet
+3. **Private Keys**: Never stored or accessed by the app
+4. **API Calls**: Backend validates all operations
+5. **Balance Checks**: Frontend and backend validate sufficient funds
+
+## 🧪 Development Tips
+
+### Hot Module Replacement
+
+Vite provides HMR out of the box. Changes to React components will update instantly without full page reload.
+
+### Debugging
+
+Use React Developer Tools to inspect:
+- Component state
+- Context values
+- Re-render patterns
+
+### Testing Wallet Connection
+
+1. Use Westend testnet for development
+2. Get free testnet tokens from the faucet
+3. Test all wallet operations before mainnet deployment
+
+### Code Quality
+
+```bash
+# Run linter
+npm run lint
+```
+
+## 🚀 Deployment
+
+### Build for Production
+
+```bash
+npm run build
+```
+
+### Environment Variables
+
+Create `.env.production`:
+
+```env
+VITE_API_URL=https://your-backend-api.com
+VITE_WS_PROVIDER=wss://rpc.polkadot.io
+```
+
+### Deployment Platforms
+
+The app can be deployed to:
+
+- **Vercel**: `vercel --prod`
+- **Netlify**: `netlify deploy --prod`
+- **GitHub Pages**: Build and deploy `dist/` folder
+- **Custom Server**: Serve `dist/` folder with any static server
+
+### Important: CORS Configuration
+
+Ensure your backend allows requests from your frontend domain:
+
+```javascript
+// Backend server.js
+app.use(cors({
+  origin: 'https://your-frontend-domain.com'
+}))
+```
+
+## 📊 Performance
+
+### Bundle Size
+
+The production build is optimized with:
+- Code splitting by route
+- Tree shaking unused code
+- Minification and compression
+- Lazy loading of heavy components
+
+### Optimization Tips
+
+1. **Images**: Use WebP format, compress before upload
+2. **Icons**: Lucide icons are tree-shakeable
+3. **Fonts**: Load fonts locally instead of from CDN
+4. **API Calls**: Implement caching strategy
+
+## 🐛 Common Issues
+
+### Wallet Not Connecting
+
+1. Ensure Polkadot extension is installed
+2. Check that extension is unlocked
+3. Verify you've approved the connection request
+4. Try refreshing the page
+
+### Balance Not Updating
+
+1. Wait a few seconds for blockchain confirmation
+2. Click refresh button or reload page
+3. Check network connection
+4. Verify correct network is selected
+
+### Transaction Failed
+
+1. Check sufficient balance for transaction + fees
+2. Verify wallet has enough DOT for gas
+3. Check network status (Polkadot status page)
+4. Try again after a few moments
+
+## 📚 Further Reading
+
+- [React Documentation](https://react.dev/)
+- [Vite Guide](https://vitejs.dev/guide/)
+- [Polkadot.js Documentation](https://polkadot.js.org/docs/)
+- [Tailwind CSS](https://tailwindcss.com/docs)
 
 ---
 
-Built with ❤️ using React and Vite
+**Happy Coding! 🚀**
