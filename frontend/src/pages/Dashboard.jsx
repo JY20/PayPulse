@@ -1,60 +1,66 @@
-import { usePayments } from '../context/PaymentContext'
+import { useEffect } from 'react'
 import { useUserData } from '../context/UserDataContext'
 import { usePolkadot } from '../context/PolkadotContext'
-import { DollarSign, TrendingUp, Calendar, Activity, Wallet } from 'lucide-react'
-import { format, isThisMonth, isBefore, startOfToday } from 'date-fns'
+import { DollarSign, TrendingUp, Calendar, Wallet, Award } from 'lucide-react'
+import { format, isThisMonth } from 'date-fns'
 import { Link } from 'react-router-dom'
 
 const Dashboard = () => {
-  const { payments, paymentHistory } = usePayments()
-  const { userData } = useUserData()
+  const { userData, fetchMemberships } = useUserData()
   const { isConnected } = usePolkadot()
 
-  const activePayments = payments.filter(p => p.status === 'active')
-  
-  const monthlyTotal = activePayments
-    .filter(p => p.frequency === 'monthly')
-    .reduce((sum, p) => sum + p.amount, 0)
-  
-  const upcomingPayments = activePayments
-    .filter(p => isThisMonth(p.nextPaymentDate))
-    .sort((a, b) => a.nextPaymentDate - b.nextPaymentDate)
-    .slice(0, 5)
+  useEffect(() => {
+    if (isConnected) {
+      fetchMemberships()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConnected])
 
-  const recentHistory = paymentHistory.slice(0, 5)
+  const memberships = userData?.memberships || []
+  const transactions = userData?.transactions || []
+  
+  const activeMemberships = memberships.filter(m => m.status === 'active')
+  
+  const monthlyTotal = activeMemberships.reduce((sum, m) => sum + m.amount, 0)
+  
+  const recentTransactions = transactions.slice(0, 5)
 
-  const overduePayments = activePayments.filter(
-    p => isBefore(p.nextPaymentDate, startOfToday())
+  const thisMonthTransactions = transactions.filter(t => 
+    isThisMonth(new Date(t.timestamp))
   )
 
+  const thisMonthTotal = thisMonthTransactions.reduce((sum, t) => {
+    return t.type === 'deposit' ? sum + t.amount : sum - t.amount
+  }, 0)
+
   const stats = [
+    {
+      title: 'Platform Balance',
+      value: `${userData?.balance.toFixed(2) || '0.00'} DOT`,
+      icon: Wallet,
+      color: 'bg-accent',
+      change: 'Available for payments'
+    },
+    {
+      title: 'Active Memberships',
+      value: activeMemberships.length,
+      icon: Award,
+      color: 'bg-secondary',
+      change: `${memberships.length} total memberships`
+    },
     {
       title: 'Monthly Total',
       value: `$${monthlyTotal.toFixed(2)}`,
       icon: DollarSign,
       color: 'bg-success',
-      change: '+12% from last month'
+      change: 'Combined membership fees'
     },
     {
-      title: 'Active Payments',
-      value: activePayments.length,
-      icon: Activity,
-      color: 'bg-secondary',
-      change: `${payments.length} total subscriptions`
-    },
-    {
-      title: 'Next Payment',
-      value: upcomingPayments.length > 0 ? format(upcomingPayments[0].nextPaymentDate, 'MMM dd') : 'None',
-      icon: Calendar,
-      color: 'bg-primary',
-      change: `${upcomingPayments.length} this month`
-    },
-    {
-      title: 'Paid This Month',
-      value: `$${paymentHistory.filter(p => isThisMonth(p.date)).reduce((sum, p) => sum + p.amount, 0).toFixed(2)}`,
+      title: 'This Month Activity',
+      value: `${thisMonthTotal >= 0 ? '+' : ''}${thisMonthTotal.toFixed(2)} DOT`,
       icon: TrendingUp,
       color: 'bg-warning',
-      change: `${paymentHistory.filter(p => isThisMonth(p.date)).length} transactions`
+      change: `${thisMonthTransactions.length} transactions`
     }
   ]
 
@@ -110,80 +116,93 @@ const Dashboard = () => {
         })}
       </div>
 
-      {/* Overdue Alerts */}
-      {overduePayments.length > 0 && (
-        <div className="bg-error/10 border border-error/30 rounded-lg p-4">
-          <h3 className="text-error font-semibold flex items-center gap-2">
-            <Activity className="h-5 w-5" />
-            Overdue Payments
-          </h3>
-          <div className="mt-3 space-y-2">
-            {overduePayments.map(payment => (
-              <div key={payment.id} className="flex justify-between items-center bg-surface p-3 rounded-lg">
-                <div>
-                  <p className="font-medium text-textPrimary">{payment.name}</p>
-                  <p className="text-sm text-textSecondary">Due: {format(payment.nextPaymentDate, 'MMM dd, yyyy')}</p>
+      {/* Active Memberships */}
+      {isConnected && activeMemberships.length > 0 && (
+        <div className="card">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-textPrimary">Active Memberships</h2>
+            <Link to="/payments" className="text-secondary hover:text-primary text-sm font-medium">
+              View All
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {activeMemberships.map((membership) => (
+              <div key={membership.id} className="bg-gradient-to-br from-accent/10 to-secondary/10 border border-accent/20 p-4 rounded-lg">
+                <div className="flex items-start justify-between mb-2">
+                  <Award className="h-5 w-5 text-accent" />
+                  <span className="text-xs bg-green-500/20 text-green-600 px-2 py-1 rounded">
+                    {membership.status}
+                  </span>
                 </div>
-                <p className="text-error font-bold">${payment.amount}</p>
+                <h3 className="font-bold text-textPrimary mb-1">{membership.title}</h3>
+                <p className="text-sm text-textSecondary mb-3 line-clamp-2">
+                  {membership.description}
+                </p>
+                <div className="flex items-center justify-between">
+                  <span className="text-lg font-bold text-accent">${membership.amount}</span>
+                  <span className="text-xs text-textSecondary">Day {membership.chargeDate}</span>
+                </div>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* Upcoming Payments */}
+      {/* Transactions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="card">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-textPrimary">Upcoming Payments</h2>
+            <h2 className="text-xl font-bold text-textPrimary">Upcoming Renewals</h2>
             <Link to="/calendar" className="text-secondary hover:text-primary text-sm font-medium">
-              View All
+              View Calendar
             </Link>
           </div>
           <div className="space-y-3">
-            {upcomingPayments.length > 0 ? (
-              upcomingPayments.map((payment) => (
-                <div key={payment.id} className="flex items-center justify-between p-3 bg-background rounded-lg hover:bg-accent/10 transition">
+            {activeMemberships.length > 0 ? (
+              activeMemberships.slice(0, 5).map((membership) => (
+                <div key={membership.id} className="flex items-center justify-between p-3 bg-background rounded-lg hover:bg-accent/10 transition">
                   <div className="flex items-center space-x-3">
                     <div className="bg-accent/20 p-2 rounded-lg">
                       <Calendar className="h-5 w-5 text-secondary" />
                     </div>
                     <div>
-                      <p className="font-medium text-textPrimary">{payment.name}</p>
-                      <p className="text-sm text-textSecondary">{format(payment.nextPaymentDate, 'MMM dd, yyyy')}</p>
+                      <p className="font-medium text-textPrimary">{membership.title}</p>
+                      <p className="text-sm text-textSecondary">Charges on day {membership.chargeDate}</p>
                     </div>
                   </div>
-                  <p className="font-bold text-textPrimary">${payment.amount}</p>
+                  <p className="font-bold text-textPrimary">${membership.amount}</p>
                 </div>
               ))
             ) : (
-              <p className="text-textSecondary text-center py-8">No upcoming payments this month</p>
+              <p className="text-textSecondary text-center py-8">No active memberships</p>
             )}
           </div>
         </div>
 
-        {/* Recent Activity */}
+        {/* Recent Transactions */}
         <div className="card">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-textPrimary">Recent Activity</h2>
-            <Link to="/payments" className="text-secondary hover:text-primary text-sm font-medium">
+            <h2 className="text-xl font-bold text-textPrimary">Recent Transactions</h2>
+            <Link to="/settings" className="text-secondary hover:text-primary text-sm font-medium">
               View All
             </Link>
           </div>
           <div className="space-y-3">
-            {recentHistory.length > 0 ? (
-              recentHistory.map((transaction) => (
+            {recentTransactions.length > 0 ? (
+              recentTransactions.map((transaction) => (
                 <div key={transaction.id} className="flex items-center justify-between p-3 bg-background rounded-lg">
                   <div className="flex items-center space-x-3">
-                    <div className="bg-success/20 p-2 rounded-lg">
-                      <DollarSign className="h-5 w-5 text-success" />
+                    <div className={`${transaction.type === 'deposit' ? 'bg-success/20' : 'bg-error/20'} p-2 rounded-lg`}>
+                      <DollarSign className={`h-5 w-5 ${transaction.type === 'deposit' ? 'text-success' : 'text-error'}`} />
                     </div>
                     <div>
-                      <p className="font-medium text-textPrimary">{transaction.name}</p>
-                      <p className="text-sm text-textSecondary">{format(transaction.date, 'MMM dd, yyyy')}</p>
+                      <p className="font-medium text-textPrimary capitalize">{transaction.type}</p>
+                      <p className="text-sm text-textSecondary">{format(new Date(transaction.timestamp), 'MMM dd, yyyy')}</p>
                     </div>
                   </div>
-                  <p className="font-bold text-success">-${transaction.amount}</p>
+                  <p className={`font-bold ${transaction.type === 'deposit' ? 'text-success' : 'text-error'}`}>
+                    {transaction.type === 'deposit' ? '+' : '-'}{transaction.amount.toFixed(2)} DOT
+                  </p>
                 </div>
               ))
             ) : (
@@ -192,6 +211,17 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Connect Wallet Message */}
+      {!isConnected && (
+        <div className="card text-center py-12">
+          <Wallet className="h-16 w-16 text-textSecondary mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-textPrimary mb-2">Connect Your Wallet</h2>
+          <p className="text-textSecondary mb-4">
+            Connect your Polkadot wallet to view your dashboard
+          </p>
+        </div>
+      )}
     </div>
   )
 }

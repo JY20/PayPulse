@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
-import { User, Wallet, CreditCard, History, Award } from 'lucide-react'
+import { User, Wallet, CreditCard, History, Award, Calendar, DollarSign } from 'lucide-react'
 import { usePolkadot } from '../context/PolkadotContext'
 import { useUserData } from '../context/UserDataContext'
 
 const Settings = () => {
   const { selectedAccount, isConnected, formatBalanceDisplay, balance: walletBalance } = usePolkadot()
-  const { userData, updateProfile, isLoading } = useUserData()
+  const { userData, updateProfile, fetchMemberships, isLoading } = useUserData()
   
   const [formData, setFormData] = useState({
     name: '',
@@ -21,6 +21,14 @@ const Settings = () => {
       })
     }
   }, [userData])
+
+  useEffect(() => {
+    if (isConnected && selectedAccount) {
+      // Fetch memberships when connected
+      fetchMemberships()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConnected, selectedAccount])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -166,23 +174,44 @@ const Settings = () => {
         <div className="card">
           <div className="flex items-center gap-3 mb-6">
             <Award className="h-6 w-6 text-secondary" />
-            <h2 className="text-xl font-bold text-textPrimary">Memberships</h2>
+            <h2 className="text-xl font-bold text-textPrimary">Active Memberships</h2>
           </div>
           
-          <div className="space-y-3">
+          <div className="space-y-4">
             {userData.memberships.map((membership) => (
               <div 
                 key={membership.id}
-                className="bg-background/50 p-4 rounded-lg"
+                className="bg-gradient-to-r from-accent/10 to-secondary/10 border border-accent/20 p-5 rounded-lg"
               >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-textPrimary">{membership.name}</p>
-                    <p className="text-sm text-textSecondary capitalize">{membership.type}</p>
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <h3 className="text-lg font-bold text-textPrimary">{membership.title}</h3>
+                      <span className="text-xs bg-green-500/20 text-green-600 px-2 py-1 rounded capitalize">
+                        {membership.status}
+                      </span>
+                    </div>
+                    <p className="text-sm text-textSecondary mb-3">
+                      {membership.description}
+                    </p>
                   </div>
-                  <p className="text-xs text-textSecondary">
-                    {new Date(membership.createdAt).toLocaleDateString()}
-                  </p>
+                </div>
+                
+                <div className="flex items-center justify-between pt-3 border-t border-textSecondary/10">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="h-4 w-4 text-accent" />
+                      <span className="text-lg font-bold text-accent">
+                        ${membership.amount.toFixed(2)}
+                      </span>
+                      <span className="text-xs text-textSecondary">/month</span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 text-sm text-textSecondary">
+                    <Calendar className="h-4 w-4" />
+                    <span>Charges on day {membership.chargeDate} each month</span>
+                  </div>
                 </div>
               </div>
             ))}

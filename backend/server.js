@@ -63,13 +63,38 @@ app.get('/api/users/:address', async (req, res) => {
     const users = await readUsersData()
     
     if (!users[address]) {
-      // Initialize new user
+      // Initialize new user with mock memberships
       users[address] = {
         address,
         name: '',
         email: '',
         balance: 0,
-        memberships: [],
+        memberships: [
+          {
+            id: '1',
+            title: 'Premium Member',
+            description: 'Access to all premium features including advanced analytics and priority support',
+            amount: 29.99,
+            chargeDate: 8, // Charges on the 8th of each month
+            status: 'active'
+          },
+          {
+            id: '2',
+            title: 'Pro Trader',
+            description: 'Professional trading tools with real-time market data and automated strategies',
+            amount: 99.99,
+            chargeDate: 15, // Charges on the 15th of each month
+            status: 'active'
+          },
+          {
+            id: '3',
+            title: 'Enterprise Plan',
+            description: 'Full enterprise suite with unlimited users, dedicated support, and custom integrations',
+            amount: 499.99,
+            chargeDate: 22, // Charges on the 22nd of each month
+            status: 'active'
+          }
+        ],
         transactions: []
       }
       await writeUsersData(users)
@@ -135,6 +160,67 @@ app.post('/api/users/:address/deposit', async (req, res) => {
   }
 })
 
+// Get memberships for a user
+app.get('/api/users/:address/memberships', async (req, res) => {
+  try {
+    const { address } = req.params
+    const users = await readUsersData()
+    
+    const memberships = users[address]?.memberships || []
+    res.json(memberships)
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch memberships' })
+  }
+})
+
+// Get calendar events for a user (membership renewals)
+app.get('/api/users/:address/calendar', async (req, res) => {
+  try {
+    const { address } = req.params
+    const users = await readUsersData()
+    
+    if (!users[address] || !users[address].memberships) {
+      return res.json([])
+    }
+
+    const events = []
+    const now = new Date()
+    
+    // Generate events for each membership for the next 3 months
+    users[address].memberships.forEach(membership => {
+      const chargeDay = membership.chargeDate || 1
+      
+      // Generate events for the next 3 months
+      for (let i = 0; i < 3; i++) {
+        const eventDate = new Date(now.getFullYear(), now.getMonth() + i, chargeDay)
+        
+        // Only include future dates
+        if (eventDate >= now) {
+          events.push({
+            id: `${membership.id}-${i}`,
+            title: membership.title,
+            description: `${membership.title} - Monthly charge on day ${chargeDay}`,
+            date: eventDate.toISOString(),
+            amount: membership.amount,
+            type: 'membership',
+            membershipId: membership.id,
+            status: membership.status,
+            chargeDate: chargeDay
+          })
+        }
+      }
+    })
+    
+    // Sort by date
+    events.sort((a, b) => new Date(a.date) - new Date(b.date))
+    
+    res.json(events)
+  } catch (error) {
+    console.error('Error fetching calendar events:', error)
+    res.status(500).json({ error: 'Failed to fetch calendar events' })
+  }
+})
+
 // Add membership
 app.post('/api/users/:address/memberships', async (req, res) => {
   try {
@@ -156,8 +242,11 @@ app.post('/api/users/:address/memberships', async (req, res) => {
     
     const membership = {
       id: Date.now().toString(),
-      ...membershipData,
-      createdAt: new Date().toISOString()
+      title: membershipData.title || 'New Membership',
+      description: membershipData.description || '',
+      amount: membershipData.amount || 0,
+      chargeDate: membershipData.chargeDate || 1, // Day of month (1-31)
+      status: membershipData.status || 'active'
     }
     
     users[address].memberships.push(membership)

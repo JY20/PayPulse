@@ -199,6 +199,45 @@ export const UserDataProvider = ({ children }) => {
     }
   }
 
+  // Fetch memberships
+  const fetchMemberships = async () => {
+    if (!selectedAccount) {
+      return []
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/users/${selectedAccount.address}/memberships`)
+      if (!response.ok) {
+        throw new Error('Failed to fetch memberships')
+      }
+      const memberships = await response.json()
+      setUserData(prev => ({ ...prev, memberships }))
+      return memberships
+    } catch (err) {
+      console.error('Error fetching memberships:', err)
+      return []
+    }
+  }
+
+  // Fetch calendar events
+  const fetchCalendarEvents = async () => {
+    if (!selectedAccount) {
+      return []
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/users/${selectedAccount.address}/calendar`)
+      if (!response.ok) {
+        throw new Error('Failed to fetch calendar events')
+      }
+      const events = await response.json()
+      return events
+    } catch (err) {
+      console.error('Error fetching calendar events:', err)
+      return []
+    }
+  }
+
   // Update user profile
   const updateProfile = async (name, email) => {
     if (!selectedAccount) {
@@ -252,6 +291,8 @@ export const UserDataProvider = ({ children }) => {
     withdrawFunds,
     addMembership,
     fetchTransactions,
+    fetchMemberships,
+    fetchCalendarEvents,
     updateProfile,
     refreshUserData: () => selectedAccount && fetchUserData(selectedAccount.address)
   }

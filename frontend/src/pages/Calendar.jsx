@@ -1,19 +1,33 @@
-import { useState } from 'react'
-import { usePayments } from '../context/PaymentContext'
+import { useState, useEffect } from 'react'
+import { usePolkadot } from '../context/PolkadotContext'
+import { useUserData } from '../context/UserDataContext'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday, isBefore, startOfToday } from 'date-fns'
-import { ChevronLeft, ChevronRight, DollarSign } from 'lucide-react'
+import { ChevronLeft, ChevronRight, DollarSign, Calendar as CalendarIcon } from 'lucide-react'
 
 const Calendar = () => {
-  const { payments } = usePayments()
+  const { isConnected } = usePolkadot()
+  const { fetchCalendarEvents } = useUserData()
   const [currentDate, setCurrentDate] = useState(new Date())
+  const [events, setEvents] = useState([])
+
+  useEffect(() => {
+    const loadEvents = async () => {
+      if (isConnected) {
+        const calendarEvents = await fetchCalendarEvents()
+        setEvents(calendarEvents)
+      }
+    }
+    loadEvents()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConnected])
 
   const monthStart = startOfMonth(currentDate)
   const monthEnd = endOfMonth(currentDate)
   const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd })
 
-  const getPaymentsForDay = (day) => {
-    return payments.filter(payment => 
-      payment.status === 'active' && isSameDay(payment.nextPaymentDate, day)
+  const getEventsForDay = (day) => {
+    return events.filter(event => 
+      event.status === 'active' && isSameDay(new Date(event.date), day)
     )
   }
 
@@ -27,11 +41,25 @@ const Calendar = () => {
 
   const today = startOfToday()
 
+  if (!isConnected) {
+    return (
+      <div className="max-w-4xl mx-auto">
+        <div className="card text-center py-12">
+          <CalendarIcon className="h-16 w-16 text-textSecondary mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-textPrimary mb-2">Connect Your Wallet</h2>
+          <p className="text-textSecondary">
+            Please connect your Polkadot wallet to view your calendar
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-textPrimary">Payment Calendar</h1>
-        <p className="text-textSecondary mt-1">View your upcoming payment schedule</p>
+        <h1 className="text-3xl font-bold text-textPrimary">Membership Calendar</h1>
+        <p className="text-textSecondary mt-1">View your membership renewal schedule</p>
       </div>
 
       <div className="card">
@@ -72,13 +100,12 @@ const Calendar = () => {
             <div key={`empty-${index}`} className="aspect-square" />
           ))}
           
-          {/* Days with payments */}
+          {/* Days with events */}
           {daysInMonth.map(day => {
-            const dayPayments = getPaymentsForDay(day)
+            const dayEvents = getEventsForDay(day)
             const isCurrentDay = isToday(day)
             const isPast = isBefore(day, today) && !isCurrentDay
-            const hasPayments = dayPayments.length > 0
-            const totalAmount = dayPayments.reduce((sum, p) => sum + p.amount, 0)
+            const hasEvents = dayEvents.length > 0
 
             return (
               <div
@@ -97,20 +124,20 @@ const Calendar = () => {
                   {format(day, 'd')}
                 </div>
                 
-                {hasPayments && (
+                {hasEvents && (
                   <div className="space-y-1">
-                    {dayPayments.slice(0, 2).map(payment => (
+                    {dayEvents.slice(0, 2).map(event => (
                       <div
-                        key={payment.id}
+                        key={event.id}
                         className="text-xs bg-accent/30 text-primary rounded px-1 py-0.5 truncate"
-                        title={`${payment.name} - $${payment.amount}`}
+                        title={`${event.title} - $${event.amount}`}
                       >
-                        ${payment.amount}
+                        ${event.amount}
                       </div>
                     ))}
-                    {dayPayments.length > 2 && (
+                    {dayEvents.length > 2 && (
                       <div className="text-xs text-textSecondary">
-                        +{dayPayments.length - 2} more
+                        +{dayEvents.length - 2} more
                       </div>
                     )}
                   </div>
@@ -131,7 +158,7 @@ const Calendar = () => {
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-accent/30 rounded"></div>
-            <span className="text-sm text-textPrimary">Has Payments</span>
+            <span className="text-sm text-textPrimary">Has Renewals</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-background border border-textSecondary/20 rounded"></div>
@@ -140,37 +167,48 @@ const Calendar = () => {
         </div>
       </div>
 
-      {/* Upcoming Payments List */}
+      {/* Upcoming Events List */}
       <div className="card">
         <h3 className="text-xl font-bold text-textPrimary mb-4">
-          Payments This Month
+          Renewals This Month
         </h3>
         <div className="space-y-3">
-          {payments
-            .filter(p => {
-              const paymentMonth = p.nextPaymentDate.getMonth()
-              const paymentYear = p.nextPaymentDate.getFullYear()
-              return paymentMonth === currentDate.getMonth() && 
-                     paymentYear === currentDate.getFullYear() &&
-                     p.status === 'active'
+          {events
+            .filter(e => {
+              const eventDate = new Date(e.date)
+              const eventMonth = eventDate.getMonth()
+              const eventYear = eventDate.getFullYear()
+              return eventMonth === currentDate.getMonth() && 
+                     eventYear === currentDate.getFullYear() &&
+                     e.status === 'active'
             })
-            .sort((a, b) => a.nextPaymentDate - b.nextPaymentDate)
-            .map(payment => (
-              <div key={payment.id} className="flex items-center justify-between p-3 bg-background rounded-lg">
+            .sort((a, b) => new Date(a.date) - new Date(b.date))
+            .map(event => (
+              <div key={event.id} className="flex items-center justify-between p-3 bg-background rounded-lg">
                 <div className="flex items-center gap-3">
                   <div className="bg-accent/20 p-2 rounded-lg">
                     <DollarSign className="h-5 w-5 text-secondary" />
                   </div>
                   <div>
-                    <p className="font-medium text-textPrimary">{payment.name}</p>
+                    <p className="font-medium text-textPrimary">{event.title}</p>
                     <p className="text-sm text-textSecondary">
-                      {format(payment.nextPaymentDate, 'EEEE, MMMM dd, yyyy')}
+                      {format(new Date(event.date), 'EEEE, MMMM dd, yyyy')}
                     </p>
+                    <p className="text-xs text-textSecondary">{event.description}</p>
                   </div>
                 </div>
-                <p className="font-bold text-textPrimary">${payment.amount}</p>
+                <p className="font-bold text-textPrimary">${event.amount}</p>
               </div>
             ))}
+          {events.filter(e => {
+            const eventDate = new Date(e.date)
+            return eventDate.getMonth() === currentDate.getMonth() && 
+                   eventDate.getFullYear() === currentDate.getFullYear()
+          }).length === 0 && (
+            <p className="text-center text-textSecondary py-8">
+              No renewals scheduled for this month
+            </p>
+          )}
         </div>
       </div>
     </div>
