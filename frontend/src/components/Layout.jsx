@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import { Home, CreditCard, Plus, CalendarDays, Settings } from 'lucide-react'
+import WalletButton from './WalletButton'
 
 const Layout = ({ children }) => {
   const location = useLocation()
@@ -28,7 +29,9 @@ const Layout = ({ children }) => {
                 PayPulse
               </span>
             </Link>
-            <nav className="hidden md:flex space-x-1">
+            <div className="flex items-center gap-4">
+              <WalletButton />
+              <nav className="hidden md:flex space-x-1">
               {navItems.map((item) => {
                 const Icon = item.icon
                 const isActive = location.pathname === item.path
@@ -47,7 +50,8 @@ const Layout = ({ children }) => {
                   </Link>
                 )
               })}
-            </nav>
+              </nav>
+            </div>
           </div>
         </div>
       </header>

@@ -11,11 +11,21 @@
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
+    "@polkadot-api/descriptors": "file:.papi/descriptors",
+    "@polkadot-api/pjs-signer": "^0.6.17",
+    "@polkadot-api/polkadot-sdk-compat": "^2.3.3",
+    "@polkadot-api/substrate-bindings": "^0.16.5",
+    "@polkadot-api/ws-provider": "^0.7.1",
+    "@polkadot/api": "^10.12.2",
+    "@polkadot/extension-dapp": "^0.46.6",
+    "@polkadot/util": "^13.5.7",
+    "@polkadot/util-crypto": "^13.5.7",
+    "date-fns": "^2.30.0",
+    "lucide-react": "^0.294.0",
+    "polkadot-api": "^1.20.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.20.0",
-    "lucide-react": "^0.294.0",
-    "date-fns": "^2.30.0"
+    "react-router-dom": "^6.20.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",
@@ -31,4 +41,3 @@
     "vite": "^5.0.8"
   }
 }
-
