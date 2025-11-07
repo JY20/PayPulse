@@ -1,0 +1,10 @@
+{
+  "polkadotNodeUrl": "wss://testnet-passet-hub.polkadot.io",
+  "platformAddress": "YOUR_PLATFORM_ADDRESS_HERE",
+  "networkName": "Paseo Testnet",
+  "_comment": "Alternative endpoints:",
+  "_westend": "wss://westend-asset-hub-rpc.polkadot.io",
+  "_rococo": "wss://rococo-asset-hub-rpc.polkadot.io",
+  "_mainnet": "wss://rpc.polkadot.io"
+}
+

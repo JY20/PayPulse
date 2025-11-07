@@ -6,11 +6,14 @@ import { createClient } from 'polkadot-api'
 import { getWsProvider } from 'polkadot-api/ws-provider/web'
 import { withPolkadotSdkCompat } from 'polkadot-api/polkadot-sdk-compat'
 import { getInjectedExtensions, connectInjectedExtension } from 'polkadot-api/pjs-signer'
-import { POLKADOT_NODE_URL } from '../config'
+import { loadConfig, getConfig } from '../config'
 
 // MultiAddress helper for transactions
 const MultiAddress = {
-  Id: (address) => ({ tag: 'Id', value: address })
+  Id: (address) => ({
+    type: 'Id',
+    value: address
+  })
 }
 
 const PolkadotContext = createContext(null)
@@ -74,12 +77,17 @@ export const PolkadotProvider = ({ children }) => {
   useEffect(() => {
     const initClient = async () => {
       try {
-        console.log('🔗 Connecting to:', POLKADOT_NODE_URL)
+        // Load configuration first
+        await loadConfig()
+        const config = getConfig()
+        const nodeUrl = config.polkadotNodeUrl
+        
+        console.log('🔗 Connecting to:', nodeUrl)
         
         // Create client with compatibility layer
         const newClient = createClient(
           withPolkadotSdkCompat(
-            getWsProvider(POLKADOT_NODE_URL)
+            getWsProvider(nodeUrl)
           )
         )
 
@@ -359,9 +367,12 @@ export const PolkadotProvider = ({ children }) => {
     // Convert amount to planck (1 DOT = 10^10 planck)
     const amountInPlanck = BigInt(Math.floor(amount * 10000000000))
     
-    // Create the transaction using typed API
+    // Create the transaction using typed API with proper MultiAddress format
     return dotApi.tx.Balances.transfer_keep_alive({
-      dest: MultiAddress.Id(recipientAddress),
+      dest: {
+        type: 'Id',
+        value: recipientAddress
+      },
       value: amountInPlanck,
     })
   }
@@ -413,7 +424,7 @@ export const PolkadotProvider = ({ children }) => {
     createTransfer,
     signAndSubmitTransaction,
     formatBalanceDisplay,
-    wsEndpoint: POLKADOT_NODE_URL,
+    wsEndpoint: getConfig().polkadotNodeUrl,
   }
 
   return (

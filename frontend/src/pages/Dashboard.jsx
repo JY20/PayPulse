@@ -1,10 +1,14 @@
 import { usePayments } from '../context/PaymentContext'
-import { DollarSign, TrendingUp, Calendar, Activity } from 'lucide-react'
+import { useUserData } from '../context/UserDataContext'
+import { usePolkadot } from '../context/PolkadotContext'
+import { DollarSign, TrendingUp, Calendar, Activity, Wallet } from 'lucide-react'
 import { format, isThisMonth, isBefore, startOfToday } from 'date-fns'
 import { Link } from 'react-router-dom'
 
 const Dashboard = () => {
   const { payments, paymentHistory } = usePayments()
+  const { userData } = useUserData()
+  const { isConnected } = usePolkadot()
 
   const activePayments = payments.filter(p => p.status === 'active')
   
@@ -60,6 +64,30 @@ const Dashboard = () => {
         <h1 className="text-3xl font-bold text-textPrimary">Dashboard</h1>
         <p className="text-textSecondary mt-1">Welcome back! Here's your payment overview</p>
       </div>
+
+      {/* Platform Balance Card */}
+      {isConnected && userData && (
+        <div className="card bg-gradient-to-r from-accent/20 to-secondary/20 border-accent/30">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Wallet className="h-5 w-5 text-accent" />
+                <p className="text-sm font-medium text-textSecondary">Platform Balance</p>
+              </div>
+              <p className="text-4xl font-bold text-textPrimary">${userData.balance.toFixed(2)}</p>
+              <p className="text-sm text-textSecondary mt-2">
+                {userData.transactions.length} transactions
+              </p>
+            </div>
+            <Link
+              to="/deposit"
+              className="btn-primary"
+            >
+              Deposit Funds
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

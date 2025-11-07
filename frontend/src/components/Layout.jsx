@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { Home, CreditCard, Plus, CalendarDays, Settings } from 'lucide-react'
+import { Home, CreditCard, Wallet, CalendarDays, Settings } from 'lucide-react'
 import WalletButton from './WalletButton'
 
 const Layout = ({ children }) => {
@@ -8,7 +8,7 @@ const Layout = ({ children }) => {
   const navItems = [
     { path: '/', icon: Home, label: 'Dashboard' },
     { path: '/payments', icon: CreditCard, label: 'Payments' },
-    { path: '/add-payment', icon: Plus, label: 'Add Payment' },
+    { path: '/deposit', icon: Wallet, label: 'Deposit' },
     { path: '/calendar', icon: CalendarDays, label: 'Calendar' },
     { path: '/settings', icon: Settings, label: 'Settings' },
   ]
