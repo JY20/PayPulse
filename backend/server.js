@@ -14,7 +14,7 @@ const AUTO_PAYMENT_CHECK_INTERVAL = 60 * 60 * 1000 // Check every hour (in milli
 const ADMIN_CONFIG_FILE = path.join(__dirname, 'data', 'admin.json')
 
 const app = express()
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 
 // Middleware
 app.use(cors())
