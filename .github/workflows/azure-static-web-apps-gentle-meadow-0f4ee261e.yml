@@ -26,11 +26,6 @@ jobs:
       - name: Install dependencies
         working-directory: ./frontend
         run: npm install
-      - name: Generate Polkadot API descriptors
-        working-directory: ./frontend
-        run: |
-          npx papi add dot -n polkadot
-          npx papi
       - name: Build application
         working-directory: ./frontend
         run: npm run build
