@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { usePolkadot } from './PolkadotContext'
+import { getConfig } from '../config'
 
 const UserDataContext = createContext()
 
@@ -11,7 +12,11 @@ export const useUserData = () => {
   return context
 }
 
-const API_BASE_URL = 'http://localhost:3001/api'
+// Get API base URL from config
+const getApiBaseUrl = () => {
+  const config = getConfig()
+  return config?.apiBaseUrl || 'http://localhost:3001/api'
+}
 
 export const UserDataProvider = ({ children }) => {
   const { selectedAccount, isConnected } = usePolkadot()
@@ -33,6 +38,7 @@ export const UserDataProvider = ({ children }) => {
     setIsLoading(true)
     setError(null)
     try {
+      const API_BASE_URL = getApiBaseUrl()
       const response = await fetch(`${API_BASE_URL}/users/${address}`)
       if (!response.ok) {
         throw new Error('Failed to fetch user data')
@@ -65,6 +71,7 @@ export const UserDataProvider = ({ children }) => {
     setIsLoading(true)
     setError(null)
     try {
+      const API_BASE_URL = getApiBaseUrl()
       const response = await fetch(`${API_BASE_URL}/users/${selectedAccount.address}/deposit`, {
         method: 'POST',
         headers: {
@@ -109,6 +116,7 @@ export const UserDataProvider = ({ children }) => {
     setIsLoading(true)
     setError(null)
     try {
+      const API_BASE_URL = getApiBaseUrl()
       const response = await fetch(`${API_BASE_URL}/users/${selectedAccount.address}/withdraw`, {
         method: 'POST',
         headers: {
@@ -149,6 +157,7 @@ export const UserDataProvider = ({ children }) => {
     setIsLoading(true)
     setError(null)
     try {
+      const API_BASE_URL = getApiBaseUrl()
       const response = await fetch(`${API_BASE_URL}/users/${selectedAccount.address}/memberships`, {
         method: 'POST',
         headers: {
@@ -186,6 +195,7 @@ export const UserDataProvider = ({ children }) => {
     }
 
     try {
+      const API_BASE_URL = getApiBaseUrl()
       const response = await fetch(`${API_BASE_URL}/users/${selectedAccount.address}/transactions`)
       if (!response.ok) {
         throw new Error('Failed to fetch transactions')
@@ -206,6 +216,7 @@ export const UserDataProvider = ({ children }) => {
     }
 
     try {
+      const API_BASE_URL = getApiBaseUrl()
       const response = await fetch(`${API_BASE_URL}/users/${selectedAccount.address}/memberships`)
       if (!response.ok) {
         throw new Error('Failed to fetch memberships')
@@ -226,6 +237,7 @@ export const UserDataProvider = ({ children }) => {
     }
 
     try {
+      const API_BASE_URL = getApiBaseUrl()
       const response = await fetch(`${API_BASE_URL}/users/${selectedAccount.address}/calendar`)
       if (!response.ok) {
         throw new Error('Failed to fetch calendar events')
@@ -247,6 +259,7 @@ export const UserDataProvider = ({ children }) => {
     setIsLoading(true)
     setError(null)
     try {
+      const API_BASE_URL = getApiBaseUrl()
       const url = `${API_BASE_URL}/users/${selectedAccount.address}/profile`
       console.log('Updating profile at:', url)
       console.log('Payload:', { name, email })
@@ -302,6 +315,7 @@ export const UserDataProvider = ({ children }) => {
     setIsLoading(true)
     setError(null)
     try {
+      const API_BASE_URL = getApiBaseUrl()
       const response = await fetch(
         `${API_BASE_URL}/users/${selectedAccount.address}/memberships/${membershipId}/pay`,
         {
