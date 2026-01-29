@@ -4,7 +4,6 @@ const OneMonth = () => {
   const canvasRef = useRef(null)
   const particlesRef = useRef([])
   const rotationRef = useRef(0)
-  const mouseRef = useRef({ x: 0, y: 0 })
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -19,16 +18,6 @@ const OneMonth = () => {
     }
     resize()
     window.addEventListener('resize', resize)
-
-    // Mouse move handler
-    const handleMouseMove = (e) => {
-      const rect = canvas.getBoundingClientRect()
-      mouseRef.current = {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
-      }
-    }
-    canvas.addEventListener('mousemove', handleMouseMove)
 
     // Generate volumetric heart with strong outline
     const generateHeartParticles = () => {
@@ -123,14 +112,8 @@ const OneMonth = () => {
       ctx.fillStyle = 'rgb(0, 0, 0)'
       ctx.fillRect(0, 0, width, height)
 
-      // Calculate rotation based on mouse position
-      const centerX = width / 2
-      const mouseX = mouseRef.current.x || centerX
-      const deltaX = mouseX - centerX
-      const targetRotation = (deltaX / centerX) * Math.PI
-      
-      // Smooth rotation transition
-      rotationRef.current += (targetRotation - rotationRef.current) * 0.1
+      // Continuous auto-rotation
+      rotationRef.current += 0.02
 
       // Process and sort by depth
       const sorted = particlesRef.current.map(p => {
@@ -206,7 +189,6 @@ const OneMonth = () => {
     return () => {
       cancelAnimationFrame(animationId)
       window.removeEventListener('resize', resize)
-      canvas.removeEventListener('mousemove', handleMouseMove)
     }
   }, [])
 
