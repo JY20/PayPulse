@@ -17,6 +17,7 @@ backend/data/
 
 # Editor directories and files
 .vscode/*
+/frontend/.vite/*
 !.vscode/extensions.json
 .idea
 .DS_Store

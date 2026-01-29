@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { Home, CreditCard, Wallet, CalendarDays, Settings } from 'lucide-react'
+import { Home, CreditCard, Wallet, CalendarDays, Settings, Heart } from 'lucide-react'
 import WalletButton from './WalletButton'
 
 const Layout = ({ children }) => {
@@ -10,6 +10,7 @@ const Layout = ({ children }) => {
     { path: '/payments', icon: CreditCard, label: 'Payments' },
     { path: '/deposit', icon: Wallet, label: 'Deposit' },
     { path: '/calendar', icon: CalendarDays, label: 'Calendar' },
+    { path: '/1month', icon: Heart, label: 'Memories' },
     { path: '/settings', icon: Settings, label: 'Settings' },
   ]
 
@@ -34,7 +35,7 @@ const Layout = ({ children }) => {
               <nav className="hidden md:flex space-x-1">
               {navItems.map((item) => {
                 const Icon = item.icon
-                const isActive = location.pathname === item.path
+                const isActive = location.pathname === item.path || (item.path === '/1month' && location.pathname.startsWith('/1month'))
                 return (
                   <Link
                     key={item.path}
@@ -59,19 +60,19 @@ const Layout = ({ children }) => {
       {/* Mobile Navigation */}
       <nav className="md:hidden bg-surface border-t border-textSecondary/10 fixed bottom-0 left-0 right-0 z-50">
         <div className="flex justify-around">
-          {navItems.slice(0, 5).map((item) => {
+          {navItems.map((item) => {
             const Icon = item.icon
-            const isActive = location.pathname === item.path
+            const isActive = location.pathname === item.path || (item.path === '/1month' && location.pathname.startsWith('/1month'))
             return (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex flex-col items-center py-3 px-2 ${
+                className={`flex flex-col items-center py-3 px-1 ${
                   isActive ? 'text-secondary' : 'text-textSecondary'
                 }`}
               >
-                <Icon className="h-6 w-6" />
-                <span className="text-xs mt-1">{item.label}</span>
+                <Icon className="h-5 w-5" />
+                <span className="text-[10px] mt-1">{item.label}</span>
               </Link>
             )
           })}
